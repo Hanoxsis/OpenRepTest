@@ -1,0 +1,220 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+    static int getNiz(ArrayList<duo> arr){
+        if(arr.get(0).a>1) {
+            return 1;
+        }
+        else {
+            return arr.get(0).b+1;
+        }
+    }
+    static int getVerh(ArrayList<duo> arr,int m) {
+        if(arr.get(arr.size()-1).b<m) {
+            return m;
+        }
+        else {
+            return arr.get(arr.size()-1).a-1;
+        }
+    }
+    public static void funk(ArrayList<duo> al,int posStart,int a,int b){
+        if(b>=al.get(posStart).a&&b<=al.get(posStart).b){
+            b=al.get(posStart).b;
+            al.remove(posStart);
+            al.add(posStart,new duo(a,b));
+            return;
+        }
+        while(al.size()>posStart&&b>=al.get(posStart).a){
+            a=Math.min(a,al.get(posStart).a);
+            b=Math.max(b,al.get(posStart).b);
+            al.remove(posStart);
+        }
+        al.add(posStart,new duo(a,b));
+    }
+    public static void main(String[] args) {
+        FastReader in = new FastReader(System.in);
+        PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
+        ArrayList<duo> al=new ArrayList<>();
+        int n=in.nextInt();
+        int m=in.nextInt();
+        al.add(new duo(in.nextInt(),in.nextInt()));
+        int a,b;
+        for(int l=1;l<n;l++){
+            a=in.nextInt();
+            b=in.nextInt();
+            if(b<al.get(0).a){
+                al.add(0,new duo(a,b));
+            }
+            else if(a<al.get(0).a){
+                funk(al,0,a,b);
+            }
+            else if(a>al.get(al.size()-1).b){
+                al.add(new duo(a,b));
+            }
+            else{
+                int i;
+                for( i=0;i<al.size();){
+                    if(a>al.get(i).b){
+                        i++;
+                    }
+                    else{
+                       break;
+                    }
+
+                }
+                funk(al,i,a,b);
+            }
+        }
+        if(al.get(0).a==1&&al.get(al.size()-1).b==m&&al.size()==1) {
+            pw.println(0);
+        }
+
+        else {
+            int niz=0;int verh=0;
+            niz=getNiz(al);
+            verh=getVerh(al,m);
+            pw.println(verh-niz+1);}
+        pw.close();
+    }
+    static class duo implements  Comparable<duo>{
+        int a;
+        int  b;
+        duo (int a,int b){
+            this.a=a;
+            this.b=b;
+        }
+        public int compareTo(duo o){
+            if(this.a-o.a==0){
+                return this.b-o.b;
+            }
+            return this.a-o.a;
+        }
+    }
+    static class FastReader {
+        InputStream is;
+        private byte[] inbuf = new byte[1024];
+        private int lenbuf = 0, ptrbuf = 0;
+
+        public FastReader(InputStream is) {
+            this.is = is;
+        }
+
+        public int readByte() {
+            if (lenbuf == -1) throw new InputMismatchException();
+            if (ptrbuf >= lenbuf) {
+                ptrbuf = 0;
+                try {
+                    lenbuf = is.read(inbuf);
+                } catch (IOException e) {
+                    throw new InputMismatchException();
+                }
+                if (lenbuf <= 0) return -1;
+            }
+            return inbuf[ptrbuf++];
+        }
+
+        public boolean isSpaceChar(int c) {
+            return !(c >= 33 && c <= 126);
+        }
+
+        private boolean isEndOfLine(int c) {
+            return c == '\n' || c == '\r' || c == -1;
+        }
+
+        public int skip() {
+            int b;
+            while ((b = readByte()) != -1 && isSpaceChar(b)) ;
+            return b;
+        }
+
+        public String next() {
+            int b = skip();
+            StringBuilder sb = new StringBuilder();
+            while (!(isSpaceChar(b))) {
+                sb.appendCodePoint(b);
+                b = readByte();
+            }
+            return sb.toString();
+        }
+
+
+        public String nextLine() {
+            int c = skip();
+            StringBuilder sb = new StringBuilder();
+            while (!isEndOfLine(c)) {
+                sb.appendCodePoint(c);
+                c = readByte();
+            }
+            return sb.toString();
+        }
+
+        public int nextInt() {
+            int num = 0, b;
+            boolean minus = false;
+            while ((b = readByte()) != -1 && !((b >= '0' && b <= '9') || b == '-')) ;
+            if (b == '-') {
+                minus = true;
+                b = readByte();
+            }
+            while (true) {
+                if (b >= '0' && b <= '9') {
+                    num = (num << 3) + (num << 1) + (b - '0');
+                } else {
+                    return minus ? -num : num;
+                }
+                b = readByte();
+            }
+        }
+
+        public long nextLong() {
+            long num = 0;
+            int b;
+            boolean minus = false;
+            while ((b = readByte()) != -1 && !((b >= '0' && b <= '9') || b == '-')) ;
+            if (b == '-') {
+                minus = true;
+                b = readByte();
+            }
+
+            while (true) {
+                if (b >= '0' && b <= '9') {
+                    num = (num << 3) + (num << 1) + (b - '0');
+                } else {
+                    return minus ? -num : num;
+                }
+                b = readByte();
+            }
+        }
+
+        public double nextDouble() {
+            return Double.parseDouble(next());
+        }
+
+        public char[] next(int n) {
+            char[] buf = new char[n];
+            int b = skip(), p = 0;
+            while (p < n && !(isSpaceChar(b))) {
+                buf[p++] = (char) b;
+                b = readByte();
+            }
+            return n == p ? buf : Arrays.copyOf(buf, p);
+        }
+
+        public char readChar() {
+            return (char) skip();
+        }
+
+        public long[] readArrayL(int n) {
+            long[] arr = new long[n];
+            for (int i = 0; i < n; i++) arr[i] = nextLong();
+            return arr;
+        }
+
+        public int[] readArray(int n) {
+            int[] arr = new int[n];
+            for (int i = 0; i < n; i++) arr[i] = nextInt();
+            return arr;
+        }
+    }
+}
